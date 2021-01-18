@@ -21,7 +21,7 @@ app.post('/posts/:id/comments', async (req, res) => {
 
     const comments = commentsByPostId[req.params.id] || [];
 
-    comments.push({ id: commentId, content });
+    comments.push({ id: commentId, content, status: 'pending' });
 
     commentsByPostId[req.params.id] = comments;
 
@@ -30,6 +30,7 @@ app.post('/posts/:id/comments', async (req, res) => {
       data: {
         id: commentId,
         content,
+        status: 'pending',
         postId: req.params.id,
       },
     });
@@ -40,8 +41,18 @@ app.post('/posts/:id/comments', async (req, res) => {
   }
 });
 
-app.post('/events', (req, res) => {
-  console.log(req.body);
+app.post('/events', async (req, res) => {
+  console.log('COMMENTED');
+
+  const { type, data } = req.body;
+  if (type == 'CommentModerated') {
+    const updateComment = commentsByPostId[data.postId].find(comment => comment.id === data.id);
+    updateComment.status = data.status;
+    await axios.post('http://localhost:4005/events', {
+      type: 'CommentUpdated',
+      data: { ...updateComment, postId: data.postId },
+    });
+  }
   res.send({});
 });
 
