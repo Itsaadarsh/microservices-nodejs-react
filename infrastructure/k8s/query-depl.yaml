@@ -1,0 +1,36 @@
+# Deployment of QUERY (With one POD)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: query-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: query
+  template:
+    metadata:
+      labels:
+        app: query
+    spec:
+      containers:
+        - name: query
+          image: itsaadarsh/microservices-query:latest
+          imagePullPolicy: Never
+---
+# CLUSTER IP service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: query-ser
+spec:
+  type: ClusterIP
+  selector:
+    app: query
+  ports:
+    - name: query
+      protocol: TCP
+      port: 4002
+      targetPort: 4002

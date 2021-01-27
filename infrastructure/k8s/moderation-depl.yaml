@@ -1,0 +1,36 @@
+# Deployment of MODERATION (With one POD)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moderation-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: moderation
+  template:
+    metadata:
+      labels:
+        app: moderation
+    spec:
+      containers:
+        - name: moderation
+          image: itsaadarsh/microservices-moderation:latest
+          imagePullPolicy: Never
+---
+# CLUSTER IP service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: moderation-ser
+spec:
+  type: ClusterIP
+  selector:
+    app: moderation
+  ports:
+    - name: moderation
+      protocol: TCP
+      port: 4003
+      targetPort: 4003
