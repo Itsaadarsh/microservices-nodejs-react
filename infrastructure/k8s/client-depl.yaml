@@ -1,0 +1,36 @@
+# Deployment of CLIENT (With one POD)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: itsaadarsh/microservices-client:latest
+          imagePullPolicy: Never
+---
+# CLUSTER IP service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-ser
+spec:
+  type: ClusterIP
+  selector:
+    app: client
+  ports:
+    - name: client
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
